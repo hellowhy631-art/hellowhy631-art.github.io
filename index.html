@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script>
+        var url = location.href;
+              if (url.includes('access_token')) {
+    // 使用正则表达式提取'accc_token'及其值
+    const tokenMatch = url.match(/access_token=([^&]+)/);
+    
+    if (tokenMatch && tokenMatch[1]) {
+        // 将提取到的token保存到localStorage
+        localStorage.setItem('access_token', tokenMatch[1]);
+        console.log('Token saved to localStorage:', tokenMatch[1]);
+    } else {
+        console.log('accc_token found in URL but could not extract the value.');
+    }
+}
+
+        var game_url="https://game.gxgwzv.cn/";
+         var access_token = localStorage.getItem('access_token');
+         if(!access_token){
+            window.location.href=game_url;
+         }
+
+   
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #121212;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .iframe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        #mobile-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            z-index: 100;
+        }
+        
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .spinner-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+        }
+        
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #4cc9f0;
+            animation: spin 1.5s linear infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .spinner-inner {
+            width: 80%;
+            height: 80%;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #f72585;
+            animation: spin 1s linear infinite reverse;
+            position: absolute;
+            top: 10%;
+            left: 10%;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: #4cc9f0;
+            border-radius: 50%;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(1) {
+            background-color: #4cc9f0;
+        }
+        
+        .dot:nth-child(2) {
+            background-color: #4361ee;
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            background-color: #3a0ca3;
+            animation-delay: 0.4s;
+        }
+        
+        .dot:nth-child(4) {
+            background-color: #f72585;
+            animation-delay: 0.6s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4cc9f0, #f72585);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .logo {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-container">
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <div class="spinner-inner"></div>
+            </div>
+            <div class="loading-text">正在加载移动端网页</div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="logo">全屏嵌入演示</div>
+        </div>
+        <iframe id="mobile-frame" src="" frameborder="0"></iframe>
+    </div>
+
+    <script>
+
+
+       
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframe = document.getElementById('mobile-frame');
+            var storage_access_token = localStorage.getItem('access_token');
+            if(storage_access_token){
+                game_url=game_url+"?access_token="+storage_access_token;
+                if(url.indexOf("?")>-1){
+                    let arrays = url.split("?");
+                    let url_str=arrays[1];
+                    game_url=game_url+"&" +url_str;
+                }
+                
+                iframe.src=game_url;
+
+                
+            }
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const progressBar = document.getElementById('progress');
+
+            
+            // 模拟加载进度
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 90) {
+                    progress = 90;
+                }
+                progressBar.style.width = progress + '%';
+            }, 300);
+            
+            // 监听iframe加载完成
+            iframe.addEventListener('load', function() {
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    loadingOverlay.classList.add('hidden');
+                }, 500);
+            });
+            
+            // 如果加载时间过长，强制隐藏加载界面
+            setTimeout(() => {
+                if (!loadingOverlay.classList.contains('hidden')) {
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    
+                    setTimeout(() => {
+                        loadingOverlay.classList.add('hidden');
+                    }, 500);
+                }
+            }, 8000);
+        });
+    </script>
+</body>
+</html>
